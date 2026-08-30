@@ -686,16 +686,19 @@ fbSubmitBtn.addEventListener('click', async ()=>{
   fbSubmitLabel.textContent = 'Enviando...';
 
   try{
+    const payload = {
+      name: name || 'Não informado',
+      rating: rating ? `${rating}/5` : 'Não informado',
+      message: msg,
+      _subject: `Feedback — Stack Atlas${rating ? ' (' + rating + '/5)' : ''}`,
+    };
+    // Formspree valida o campo "email" como e-mail de verdade — só inclui se preenchido.
+    if(email) payload.email = email;
+
     const res = await fetch(FORMSPREE_ENDPOINT, {
       method: 'POST',
       headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: name || 'Não informado',
-        email: email || 'Não informado',
-        rating: rating ? `${rating}/5` : 'Não informado',
-        message: msg,
-        _subject: `Feedback — Stack Atlas${rating ? ' (' + rating + '/5)' : ''}`,
-      }),
+      body: JSON.stringify(payload),
     });
 
     if(res.ok){
