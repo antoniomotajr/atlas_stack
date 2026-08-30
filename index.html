@@ -706,9 +706,20 @@ fbSubmitBtn.addEventListener('click', async ()=>{
       rating = 0;
       document.querySelectorAll('.fb-star').forEach(s=>{ s.classList.remove('on'); s.setAttribute('aria-checked','false'); });
     } else {
+      let detail = '';
+      try{
+        const data = await res.json();
+        detail = data?.errors?.map(e=>e.message).join(' ') || data?.error || '';
+      }catch(_){ /* resposta não era JSON */ }
+      console.error('Formspree respondeu', res.status, detail);
+      sendErrorEl.textContent = detail
+        ? `Não foi possível enviar (${res.status}): ${detail}`
+        : `Não foi possível enviar agora (erro ${res.status}). Veja o console para detalhes.`;
       sendErrorEl.classList.add('show');
     }
   } catch(err){
+    console.error('Falha de rede ao enviar feedback', err);
+    sendErrorEl.textContent = 'Falha de conexão ao enviar. Verifique sua internet e tente de novo.';
     sendErrorEl.classList.add('show');
   } finally {
     fbSubmitBtn.disabled = false;
